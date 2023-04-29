@@ -5,8 +5,8 @@
 #ifndef CRL_MOCAP_MOTIONPROCESSINGUTILS_H
 #define CRL_MOCAP_MOTIONPROCESSINGUTILS_H
 
+#include "crl-basic/utils/trajectory.h"
 #include "mocap/MocapClip.h"
-#include "utils/trajectory.h"
 
 namespace crl::mocap {
 

@@ -1,8 +1,8 @@
 #pragma once
 
 // Lib includes
-#include "utils/geoms.h"
-#include "utils/mathUtils.h"
+#include "crl-basic/utils/geoms.h"
+#include "crl-basic/utils/mathUtils.h"
 
 // STL includes
 #include <memory>

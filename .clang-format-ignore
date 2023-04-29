@@ -1,0 +1,7 @@
+# build directories
+./build/*
+./cmake-build-*/*
+
+# copied from thirdparty
+./ext/*
+./src/libs/gui/imgui_widgets/*

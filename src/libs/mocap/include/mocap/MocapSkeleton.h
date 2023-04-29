@@ -1,8 +1,8 @@
 #pragma once
 
-#include <gui/renderer.h>
-#include <utils/mathDefs.h>
-#include <utils/utils.h>
+#include <crl-basic/gui/renderer.h>
+#include <crl-basic/utils/mathDefs.h>
+#include <crl-basic/utils/utils.h>
 
 #include <memory>
 #include <vector>

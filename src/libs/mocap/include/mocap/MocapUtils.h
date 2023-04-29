@@ -9,7 +9,7 @@
 #include <limits>
 
 // CRL includes
-#include <utils/mathUtils.h>
+#include <crl-basic/utils/mathUtils.h>
 
 namespace crl::mocap {
 

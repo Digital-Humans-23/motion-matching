@@ -7,10 +7,10 @@
 
 #include <string>
 
-#include "gui/renderer.h"
+#include "crl-basic/gui/renderer.h"
+#include "crl-basic/utils/geoms.h"
+#include "crl-basic/utils/mathDefs.h"
 #include "mocap/MocapMarkerState.h"
-#include "utils/geoms.h"
-#include "utils/mathDefs.h"
 
 namespace crl::mocap {
 

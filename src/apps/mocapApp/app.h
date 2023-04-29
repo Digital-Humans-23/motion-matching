@@ -1,8 +1,7 @@
 #pragma once
 
-#include <gui/application.h>
+#include <crl-basic/gui/application.h>
 #include <imgui_widgets/imfilebrowser.h>
-#include <utils/logger.h>
 
 #include "mocap/MocapClip.h"
 #include "mocap/MocapClipUtils.h"

@@ -9,7 +9,7 @@
 #include <vector>
 
 #include "imgui_widgets/implot.h"
-#include "utils/mathDefs.h"
+#include "crl-basic/utils/mathDefs.h"
 
 /* TODO: we are going to merge this into crl-basic... */
 namespace crl::mocap {

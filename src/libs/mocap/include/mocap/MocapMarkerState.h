@@ -5,8 +5,8 @@
 #ifndef CRL_MOCAP_MOCAPMARKERSTATE_H
 #define CRL_MOCAP_MOCAPMARKERSTATE_H
 
-#include "utils/mathDefs.h"
-#include "utils/mathUtils.h"
+#include "crl-basic/utils/mathDefs.h"
+#include "crl-basic/utils/mathUtils.h"
 
 namespace crl::mocap {
 

@@ -1,6 +1,6 @@
 #pragma once
 
-#include <gui/renderer.h>
+#include <crl-basic/gui/renderer.h>
 
 #include "mocap/MocapMarker.h"
 
