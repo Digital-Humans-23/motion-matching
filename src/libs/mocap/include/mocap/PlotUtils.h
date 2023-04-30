@@ -8,10 +8,9 @@
 #include <string>
 #include <vector>
 
-#include "imgui_widgets/implot.h"
 #include "crl-basic/utils/mathDefs.h"
+#include "imgui_widgets/implot.h"
 
-/* TODO: we are going to merge this into crl-basic... */
 namespace crl::mocap {
 
 template <typename T>
@@ -22,6 +21,7 @@ struct Line2D {
      * e.g. [](const P3D &d) { return (float)d.y; }
      */
     std::function<float(T)> getter;
+    ImPlotMarker marker = ImPlotMarker_None;
 };
 
 template <typename T>
@@ -34,7 +34,8 @@ public:
 private:
     int maxSize = 1000;
     int offset = 0;
-    bool fitAxis = true;
+    bool fitAxisX = true;
+    bool fitAxisY = true;
     // vector of pair (x, T y)
     std::vector<std::pair<float, T>> data;
     std::string title;
@@ -43,7 +44,7 @@ private:
 
     // vector of line spec
     std::vector<Line2D<T>> lineSpecs;
-    int drawIndex = 0;
+    int DRAWINDEX_ = 0;
 
 public:
     explicit PlotLine2D(const std::string &title, const std::string &xlabel, const std::string &ylabel, int maxSize = 1000)
@@ -93,25 +94,36 @@ public:
     }
 
     void draw(double verticalGuide = 0) {
-        ImGui::Checkbox(std::string("Always Fit X Axes##" + title).c_str(), &fitAxis);
-        ImPlot::FitNextPlotAxes(fitAxis, fitAxis);
+        ImGui::Checkbox(std::string("Always Fit X Axes##" + title).c_str(), &fitAxisX);
+        ImGui::SameLine();
+        ImGui::Checkbox(std::string("Always Fit Y Axes##" + title).c_str(), &fitAxisY);
+        // use slider for fit axis x instead of ImPlot API.
+        if (fitAxisY) {
+            ImPlot::SetNextAxisToFit(ImAxis_Y1);
+        }
+        if (fitAxisX) {
+            ImPlot::SetNextAxisToFit(ImAxis_X1);
+        }
 
-        if (ImPlot::BeginPlot(title.c_str(), xlabel.c_str(), ylabel.c_str(), ImVec2(-1, 300))) {
-            for (drawIndex = 0; drawIndex < lineSpecs.size(); drawIndex++) {
+        if (ImPlot::BeginPlot(title.c_str(), ImVec2(-1, 300))) {
+            ImPlot::SetupAxis(ImAxis_X1, xlabel.c_str());
+            ImPlot::SetupAxis(ImAxis_Y1, ylabel.c_str());
+            for (DRAWINDEX_ = 0; DRAWINDEX_ < lineSpecs.size(); DRAWINDEX_++) {
+                ImPlot::SetNextMarkerStyle(lineSpecs[DRAWINDEX_].marker);
                 ImPlot::PlotLineG(
-                    lineSpecs[drawIndex].label.c_str(),
+                    lineSpecs[DRAWINDEX_].label.c_str(),
                     [](void *data, int idx) {
                         auto *my_data = (PlotLine2D<T> *)data;
                         auto &datapoint = my_data->getData(idx);
                         ImPlotPoint p;
                         p.x = (float)datapoint.first;
-                        p.y = my_data->lineSpecs[my_data->drawIndex].getter(datapoint.second);
+                        p.y = my_data->lineSpecs[my_data->DRAWINDEX_].getter(datapoint.second);
                         return p;
                     },
                     this, getSize());
             }
             if (drawVerticalGuide)
-                ImPlot::DragLineX("t", &verticalGuide, true);
+                ImPlot::DragLineX(0, &verticalGuide, ImVec4(1,1,1,1));
             ImPlot::EndPlot();
         }
     }
