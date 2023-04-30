@@ -56,3 +56,4 @@ start guide.
 - This repo will be keep updated, so please stay tuned. If you want to sync your repo with the new commits,
   use ```git rebase``` instead of ```git merge```:
   see [this](https://www.atlassian.com/git/tutorials/merging-vs-rebasing) for more details of ```git rebase```.
+- Please actively use GitHub issue for questions and reporting issues on the code base!
