@@ -167,6 +167,8 @@ public:
         channel_data_ = arg;
     }
 
+    void reserve_channel_frame(int N_frame);
+
     /** Gets channels name of this joint
      *  \return The joint's channels name
      */
@@ -203,6 +205,24 @@ public:
         }
         return ltpTransforms_[frame];
     }
+
+    /** Return a rotation-only affine transform object (Eigen)
+     *   \param xRot
+     *   \param xRot
+     *   \param xRot
+     */
+    Transform_t getTransformFromMotionData(double zRot, double yRot, double xRot);
+
+    /** Returns a full affine transform object (Eigen)
+     *   \param xTrans
+     *   \param yTrans
+     *   \param zTrans
+     *   \param xRot
+     *   \param xRot
+     *   \param xRot
+     */
+    Transform_t getTransformFromMotionData(double xTrans, double yTrans, double zTrans, double zRot, double xRot, double yRot);
+
 
     /** Get the world position of this joint at the selected frame
      *   \param frame    index of the selected frame

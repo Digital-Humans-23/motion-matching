@@ -4,6 +4,8 @@ project(mocap)
 
 set(CRL_TARGET_NAME ${PROJECT_NAME})
 
+find_package(OpenMP)
+
 file(
         GLOB
         CRL_SOURCES #
@@ -35,6 +37,9 @@ list(
         "eigen" #
 )
 
+if(OpenMP_CXX_FOUND)
+    list ( APPEND CRL_TARGET_LINK_LIBS PUBLIC OpenMP::OpenMP_CXX)
+endif()
 
 # we use filesystem which is "experimental" for some compilers for those we need
 # to add fs lib to link libraries
