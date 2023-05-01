@@ -3,6 +3,7 @@
 #include "mocap/MocapMarkers.h"
 #include "mocap/MocapSkeleton.h"
 #include "mocap/MocapSkeletonState.h"
+#include "omp.h"
 
 namespace crl::mocap {
 
@@ -70,7 +71,8 @@ public:
 
 class BVHClip : public MocapClip<MocapSkeleton> {
 public:
-    explicit BVHClip(const std::string &filePath) {
+    // explicit BVHClip(const std::string &filePath) {
+    explicit BVHClip(const std::filesystem::path &filePath) {
         loadFromFile(filePath);
     }
 
@@ -81,45 +83,54 @@ private:
         if (mocapPath.extension() == ".bvh")
             loadFromBVH(mocapPath);
         else
-            throw std::runtime_error("Not a supported file format: " + std::string(mocapPath.extension()));
+            // throw std::runtime_error("Not a supported file format: " + std::string(mocapPath.extension()));
+            throw std::runtime_error("Not a supported file format: " + mocapPath.extension().string());
+
     }
 
     void loadFromBVH(const std::filesystem::path &mocapPath) {
         BvhParser parser;
         Bvh data;
-        if (parser.parse(std::string(mocapPath), &data)) {
-            throw std::runtime_error("Cannot parse bvh file: " + std::string(mocapPath));
+        // if (parser.parse(std::string(mocapPath), &data)) {
+        if (parser.parse(mocapPath.string(), &data)) {
+            // throw std::runtime_error("Cannot parse bvh file: " + std::string(mocapPath));
+            throw std::runtime_error("Cannot parse bvh file: " + mocapPath.string());
         }
 
         // load skeleton
-        model_ = new MocapSkeleton(mocapPath.c_str());
+        // model_ = new MocapSkeleton(mocapPath.c_str());
+        model_ = new MocapSkeleton(mocapPath.string().c_str());
 
         // load motion
         auto bvhJoints = data.getJoints();
         double dt = data.getFrameTime();
 
-        name_ = std::string(mocapPath.filename());
+        // name_ = std::string(mocapPath.filename());
+        name_ = mocapPath.filename().string();
         frameTimeStep_ = dt;
 
         // save frame into motion
         // need to start index = 1 to compute velocity by FD
         motions_.reserve(data.getFramesCount());
-        for (uint i = 1; i < data.getFramesCount(); i++) {
+        for (int i = 0; i < motions_.capacity(); i++) motions_.emplace_back(model_);
+
+        #pragma omp parallel for
+        for (int i = 1; i < data.getFramesCount(); i++) {
             auto bvhRoot = data.getRootJoint();
 
             auto previousT = bvhRoot->getLtwTransformAtFrame(i - 1);
             auto currentT = bvhRoot->getLtwTransformAtFrame(i);
 
-            motions_.emplace_back(model_);
+            // motions_.emplace_back(model_);
 
             // root state
             V3D rootVel = V3D(currentT.translation() - previousT.translation()) / dt;
             V3D rootAngVel = estimateAngularVelocity(Quaternion(previousT.rotation()).normalized(), Quaternion(currentT.rotation()).normalized(), dt);
 
-            motions_.back().setRootPosition(P3D() + currentT.translation());
-            motions_.back().setRootOrientation(Quaternion(currentT.rotation()).normalized());
-            motions_.back().setRootVelocity(rootVel);
-            motions_.back().setRootAngularVelocity(rootAngVel);
+            motions_[i-1].setRootPosition(P3D() + currentT.translation());
+            motions_[i-1].setRootOrientation(Quaternion(currentT.rotation()).normalized());
+            motions_[i-1].setRootVelocity(rootVel);
+            motions_[i-1].setRootAngularVelocity(rootAngVel);
 
             // joint state
             for (uint j = 0; j < bvhJoints.size(); j++) {
@@ -132,13 +143,14 @@ private:
                 V3D angVelRel = estimateAngularVelocity(Quaternion(previousLtp.rotation()).normalized(), Quaternion(currentLtp.rotation()).normalized(), dt);
                 V3D velRel = V3D(currentLtp.translation() - previousLtp.translation()) / dt;
 
-                motions_.back().setJointRelativeOrientation(qRel, j);
-                motions_.back().setJointTranslation(tRel, j);
-                motions_.back().setJointRelativeAngVelocity(angVelRel, j);
-                motions_.back().setJointRelativeVelocity(velRel, j);
+                motions_[i-1].setJointRelativeOrientation(qRel, j);
+                motions_[i-1].setJointTranslation(tRel, j);
+                motions_[i-1].setJointRelativeAngVelocity(angVelRel, j);
+                motions_[i-1].setJointRelativeVelocity(velRel, j);
             }
 
             // update frame count
+            #pragma omp critical
             frameCount_++;
         }
     }
@@ -146,7 +158,8 @@ private:
 
 class C3DClip : public MocapClip<MocapMarkers> {
 public:
-    explicit C3DClip(const std::string &filePath) {
+    // explicit C3DClip(const std::string &filePath) {
+    explicit C3DClip(const std::filesystem::path &filePath) {
         loadFromFile(filePath);
     }
 
@@ -157,18 +170,22 @@ private:
         if (mocapPath.extension() == ".c3d")
             loadFromC3D(mocapPath);
         else
-            throw std::runtime_error("Not a supported file format: " + std::string(mocapPath.extension()));
+            // throw std::runtime_error("Not a supported file format: " + std::string(mocapPath.extension()));
+            throw std::runtime_error("Not a supported file format: " + mocapPath.extension().string());
     }
 
     void loadFromC3D(const std::filesystem::path &mocapPath) {
         crl::mocap::C3DFile c3dfile;
-        bool result = c3dfile.load(mocapPath.c_str());
+        // bool result = c3dfile.load(mocapPath.c_str());
+        bool result = c3dfile.load(mocapPath.string().c_str());
         if (!result) {
-            throw std::runtime_error("Cannot load c3d file: " + std::string(mocapPath));
+            // throw std::runtime_error("Cannot load c3d file: " + std::string(mocapPath));
+            throw std::runtime_error("Cannot load c3d file: " + mocapPath.string());
         }
 
         // props
-        name_ = std::string(mocapPath.filename());
+        // name_ = std::string(mocapPath.filename());
+        name_ = mocapPath.filename().string();
         frameTimeStep_ = 1.0 / c3dfile.header.video_sampling_rate;
 
         // unit
@@ -179,7 +196,8 @@ private:
 
         // markers
         std::vector<std::string> labels = c3dfile.point_label;
-        model_ = new MocapMarkers(mocapPath.c_str());
+        // model_ = new MocapMarkers(mocapPath.c_str());
+        model_ = new MocapMarkers(mocapPath.string().c_str());
         // note. first_frame is usually 1 and last_frame is N frame.
         for (int i = c3dfile.header.first_frame; i <= c3dfile.header.last_frame; i++) {
             motions_.emplace_back(model_);
