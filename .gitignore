@@ -2,6 +2,7 @@ build
 CMakeLists.txt.user
 .DS_Store
 data/out
+data/lafan1
 
 # imgui
 *.ini
