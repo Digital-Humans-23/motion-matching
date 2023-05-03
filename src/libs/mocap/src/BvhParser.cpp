@@ -38,7 +38,8 @@ const std::string kYrot = "Yrotation";
 const std::string kZrot = "Zrotation";
 
 const int scale = 100;
-
+Eigen::Vector3d init_offset;
+const std::string ROOT_NAME = "Hips";
 //##############################################################################
 // Main parse function
 //##############################################################################
@@ -174,7 +175,7 @@ int BvhParser::parseJoint(std::ifstream &file, std::shared_ptr<BvhJoint> parent,
             std::cerr << "Failure while parsing offset";
             return -1;
         }
-
+        if(name == ROOT_NAME) init_offset << x, y, z;
         joint->setOffset(x, y, z);
 
 #if VERBOSE
@@ -309,8 +310,10 @@ int BvhParser::parseMotion(std::ifstream &file) {
                 std::vector<float> data;
                 for (int j = 0; j < joint->getNumberOfChannels(); j++) {
                     file >> number;
-                    if (counter++ < 3) {
+                    if (counter < 3) {
                         number /= scale;
+                        number -= init_offset[counter];
+                        counter++;
                     }
                     data.push_back(number);
                     if (j == joint->getNumberOfChannels() - 1){
