@@ -330,7 +330,8 @@ private:
             return;
 
         footSteps.clear();
-        footMarkerNames = {"LeftHand", "LeftFoot", "RightHand", "RightFoot"};
+        // footMarkerNames = {"LeftHand", "LeftFoot", "RightHand", "RightFoot"};
+        footMarkerNames = {"LeftHand", "LeftToe", "RightHand", "RightToe"};
         linkNames = {};
         virtualLinkNames = {};
 

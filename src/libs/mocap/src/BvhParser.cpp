@@ -13,7 +13,7 @@
  * Not fully tested
  */
 #define MULTI_HIERARCHY 0
-#define VERBOSE 0
+#define VERBOSE 1
 
 // FIXME: fix bad parsing methodology
 
@@ -36,6 +36,8 @@ const std::string kZpos = "Zposition";
 const std::string kXrot = "Xrotation";
 const std::string kYrot = "Yrotation";
 const std::string kZrot = "Zrotation";
+
+const int scale = 100;
 
 //##############################################################################
 // Main parse function
@@ -102,7 +104,7 @@ int BvhParser::parseHierarchy(std::ifstream &file) {
             if (ret)
                 return ret;
 #if VERBOSE
-            std::cout << "There is " << bvh_->num_channels() << " data channels in the"
+            std::cout << "There is " << bvh_->getTotalNumberOfChannels() << " data channels in the"
                       << " file" << std::endl;
 #endif
 
@@ -167,6 +169,7 @@ int BvhParser::parseJoint(std::ifstream &file, std::shared_ptr<BvhJoint> parent,
 
         try {
             file >> x >> y >> z;
+            x /= scale, y /= scale, z /= scale;
         } catch (const std::ios_base::failure e) {
             std::cerr << "Failure while parsing offset";
             return -1;
@@ -193,7 +196,7 @@ int BvhParser::parseJoint(std::ifstream &file, std::shared_ptr<BvhJoint> parent,
         ret = parseChannelOrder(file, joint);
 
 #if VERBOSE
-        std::cout << "Joint has " << joint->num_channels() << " data channels" << std::endl;
+        std::cout << "Joint has " << joint->getNumberOfChannels() << " data channels" << std::endl;
 #endif
 
         if (ret)
@@ -301,11 +304,18 @@ int BvhParser::parseMotion(std::ifstream &file) {
 
         float number;
         for (int i = 0; i < frames_num; i++) {
+            int counter = 0;
             for (auto joint : bvh_->getJoints()) {
                 std::vector<float> data;
                 for (int j = 0; j < joint->getNumberOfChannels(); j++) {
                     file >> number;
+                    if (counter++ < 3) {
+                        number /= scale;
+                    }
                     data.push_back(number);
+                    if (j == joint->getNumberOfChannels() - 1){
+                        std::swap(data[data.size()-2], data[data.size()-1]);
+                    }
                 }
 
                 joint->addFrameMotionData(data);
