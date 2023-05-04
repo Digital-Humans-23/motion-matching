@@ -73,26 +73,6 @@ std::string vec3tos(const glm::vec3 &vector) {
     return result;
 }
 
-Transform_t getTransformFromMotionData(double zRot, double xRot, double yRot) {
-    // Create rotation quaternion from Euler angles
-    Eigen::Quaternion q = crl::getRotationQuaternion(RAD(zRot), crl::V3D(0, 0, 1)) *  //
-                          crl::getRotationQuaternion(RAD(xRot), crl::V3D(1, 0, 0)) *  //
-                          crl::getRotationQuaternion(RAD(yRot), crl::V3D(0, 1, 0));
-    // Create transform
-    Transform_t t(q);
-
-    return t;
-}
-
-Transform_t getTransformFromMotionData(double xTrans, double yTrans, double zTrans, double zRot, double xRot, double yRot) {
-    Transform_t translation;
-    translation = Eigen::Translation3d(xTrans, yTrans, zTrans);
-    Transform_t rotation;
-    rotation = getTransformFromMotionData(zRot, xRot, yRot);
-
-    // First rotate then translate
-    return translation * rotation;
-}
 
 V3D estimateAngularVelocity(const Quaternion &qStart, const Quaternion &qEnd, double dt) {
     // qEnd = rot(w_p, dt) * qStart

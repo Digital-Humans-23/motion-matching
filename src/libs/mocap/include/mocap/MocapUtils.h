@@ -56,8 +56,9 @@ std::string vec3tos(const glm::vec3 &vector);
  *   \param xRot
  *   \param xRot
  *   \param xRot
+ *   \note This function is moved to as the member function of BvhJoint class
  */
-Transform_t getTransformFromMotionData(double zRot, double xRot, double yRot);
+//Transform_t getTransformFromMotionData(double zRot, double xRot, double yRot);
 
 /** Returns a full affine transform object (Eigen)
  *   \param xTrans
@@ -66,8 +67,9 @@ Transform_t getTransformFromMotionData(double zRot, double xRot, double yRot);
  *   \param xRot
  *   \param xRot
  *   \param xRot
+ *   \note This function is moved to as the member function of BvhJoint class
  */
-Transform_t getTransformFromMotionData(double xTrans, double yTrans, double zTrans, double zRot, double xRot, double yRot);
+//Transform_t getTransformFromMotionData(double xTrans, double yTrans, double zTrans, double zRot, double xRot, double yRot);
 
 /**
  * Returns the angular velocity that explains how we got from qStart to qEnd in

@@ -11,6 +11,38 @@ namespace crl::mocap {
         }                                                                      \
     }
 
+Transform_t BvhJoint::getTransformFromMotionData(double eu1, double eu2, double eu3) {
+
+    std::vector<Channel> eulerOrder = getChannelsOrder();
+    std::vector<double> input;
+    Eigen::Quaternion q(1.0,0.0,0.0,0.0);
+
+    eulerOrder.assign(eulerOrder.end()-3, eulerOrder.end());
+    input.push_back(eu1), input.push_back(eu2), input.push_back(eu3);
+    
+    for(int i = 0; i<3; i++){
+        if(eulerOrder[i]==BvhJoint::Channel::XROTATION) q *= crl::getRotationQuaternion(RAD(input[i]), crl::V3D(1, 0, 0));
+        else if(eulerOrder[i]==BvhJoint::Channel::YROTATION) q *= crl::getRotationQuaternion(RAD(input[i]), crl::V3D(0, 1, 0));
+        else q *= crl::getRotationQuaternion(RAD(input[i]), crl::V3D(0, 0, 1));
+    }
+
+    // Create transform
+    Transform_t t(q);
+
+    return t;
+}
+
+Transform_t BvhJoint::getTransformFromMotionData(double xTrans, double yTrans, double zTrans, double zRot, double xRot, double yRot) {
+    Transform_t translation;
+    translation = Eigen::Translation3d(xTrans, yTrans, zTrans);
+    Transform_t rotation;
+    rotation = getTransformFromMotionData(zRot, xRot, yRot);
+
+    // First rotate then translate
+    return translation * rotation;
+}
+
+
 void BvhJoint::addFrameMotionData(const std::vector<float> &data) {
     // Sanity check
     if (data.empty()) {

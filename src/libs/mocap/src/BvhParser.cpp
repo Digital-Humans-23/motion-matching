@@ -316,9 +316,9 @@ int BvhParser::parseMotion(std::ifstream &file) {
                         counter++;
                     }
                     data.push_back(number);
-                    if (j == joint->getNumberOfChannels() - 1){
-                        std::swap(data[data.size()-2], data[data.size()-1]);
-                    }
+                    // if (j == joint->getNumberOfChannels() - 1){
+                    //     // std::swap(data[data.size()-2], data[data.size()-1]);
+                    // }
                 }
 
                 joint->addFrameMotionData(data);
