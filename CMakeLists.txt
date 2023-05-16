@@ -16,7 +16,7 @@ set(CRL_DATA_FOLDER
 # options
 # -----------------------------------------------------------------------------
 
-option(CRL_BASIC_BUILD_APPS "Build crl-basic example apps." ON)
+option(MOTION_MATCHING_BUILD_APPS "Build motion-matching example apps." ON)
 option(BUILD_TESTS "Build unit tests" OFF)
 
 # -----------------------------------------------------------------------------
