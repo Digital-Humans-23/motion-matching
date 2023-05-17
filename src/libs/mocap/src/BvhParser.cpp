@@ -175,8 +175,13 @@ int BvhParser::parseJoint(std::ifstream &file, std::shared_ptr<BvhJoint> parent,
             std::cerr << "Failure while parsing offset";
             return -1;
         }
-        if(name == ROOT_NAME) init_offset << x, y, z;
-        joint->setOffset(x, y, z);
+        if(name == ROOT_NAME) {
+            init_offset << x, y, z;
+            joint->setOffset(0, y, 0);
+        }
+        else{
+            joint->setOffset(x, y, z);
+        }
 
 #if VERBOSE
         std::cout << "Offset x: " << x << ", y: " << y << ", z: " << z << std::endl;
