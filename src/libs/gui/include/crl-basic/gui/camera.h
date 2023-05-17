@@ -51,6 +51,10 @@ public:
         return target + glm::vec3(rotation() * glm::vec4(direction, 1)) * -distanceToTarget;
     }
 
+    glm::vec3 getOrientation() const {
+        return glm::vec3(rotation() * glm::vec4(direction, 1));
+    }
+    
     // Processes input received from a mouse input system. Expects the offset
     // value in both the x and y direction.
     void processLeftMouseMovement(float xOffset, float yOffset) {
