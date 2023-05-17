@@ -308,6 +308,8 @@ int BvhParser::parseMotion(std::ifstream &file) {
             int counter = 0;
             for (auto joint : bvh_->getJoints()) {
                 std::vector<float> data;
+                data.reserve(joint->getNumberOfChannels());
+                joint->reserve_channel_frame(frames_num);
                 for (int j = 0; j < joint->getNumberOfChannels(); j++) {
                     file >> number;
                     if (counter < 3) {

@@ -3,6 +3,7 @@
 #include "mocap/MocapMarkers.h"
 #include "mocap/MocapSkeleton.h"
 #include "mocap/MocapSkeletonState.h"
+#include "omp.h"
 
 namespace crl::mocap {
 
@@ -111,22 +112,25 @@ private:
         // save frame into motion
         // need to start index = 1 to compute velocity by FD
         motions_.reserve(data.getFramesCount());
-        for (uint i = 1; i < data.getFramesCount(); i++) {
+        for (int i = 0; i < motions_.capacity(); i++) motions_.emplace_back(model_);
+
+        #pragma omp parallel for
+        for (int i = 1; i < data.getFramesCount(); i++) {
             auto bvhRoot = data.getRootJoint();
 
             auto previousT = bvhRoot->getLtwTransformAtFrame(i - 1);
             auto currentT = bvhRoot->getLtwTransformAtFrame(i);
 
-            motions_.emplace_back(model_);
+            // motions_.emplace_back(model_);
 
             // root state
             V3D rootVel = V3D(currentT.translation() - previousT.translation()) / dt;
             V3D rootAngVel = estimateAngularVelocity(Quaternion(previousT.rotation()).normalized(), Quaternion(currentT.rotation()).normalized(), dt);
 
-            motions_.back().setRootPosition(P3D() + currentT.translation());
-            motions_.back().setRootOrientation(Quaternion(currentT.rotation()).normalized());
-            motions_.back().setRootVelocity(rootVel);
-            motions_.back().setRootAngularVelocity(rootAngVel);
+            motions_[i-1].setRootPosition(P3D() + currentT.translation());
+            motions_[i-1].setRootOrientation(Quaternion(currentT.rotation()).normalized());
+            motions_[i-1].setRootVelocity(rootVel);
+            motions_[i-1].setRootAngularVelocity(rootAngVel);
 
             // joint state
             for (uint j = 0; j < bvhJoints.size(); j++) {
@@ -139,13 +143,14 @@ private:
                 V3D angVelRel = estimateAngularVelocity(Quaternion(previousLtp.rotation()).normalized(), Quaternion(currentLtp.rotation()).normalized(), dt);
                 V3D velRel = V3D(currentLtp.translation() - previousLtp.translation()) / dt;
 
-                motions_.back().setJointRelativeOrientation(qRel, j);
-                motions_.back().setJointTranslation(tRel, j);
-                motions_.back().setJointRelativeAngVelocity(angVelRel, j);
-                motions_.back().setJointRelativeVelocity(velRel, j);
+                motions_[i-1].setJointRelativeOrientation(qRel, j);
+                motions_[i-1].setJointTranslation(tRel, j);
+                motions_[i-1].setJointRelativeAngVelocity(angVelRel, j);
+                motions_[i-1].setJointRelativeVelocity(velRel, j);
             }
 
             // update frame count
+            #pragma omp critical
             frameCount_++;
         }
     }

@@ -142,4 +142,7 @@ bool BvhJoint::getRayIntersectionPoint(const crl::Ray &ray,
     return tMin < DBL_MAX / 2.0;
 }
 
+void BvhJoint::reserve_channel_frame(int N_frame) {channel_data_.reserve(N_frame);}
+
+
 }  // namespace crl::mocap

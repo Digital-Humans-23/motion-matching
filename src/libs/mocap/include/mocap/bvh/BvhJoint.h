@@ -167,6 +167,8 @@ public:
         channel_data_ = arg;
     }
 
+    void reserve_channel_frame(int N_frame);
+
     /** Gets channels name of this joint
      *  \return The joint's channels name
      */
