@@ -1,4 +1,4 @@
 add_subdirectory(libs)
-if (CRL_BASIC_BUILD_APPS)
+if (MOTION_MATCHING_BUILD_APPS)
     add_subdirectory(apps)
 endif ()
