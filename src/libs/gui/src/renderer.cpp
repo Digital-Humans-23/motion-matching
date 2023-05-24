@@ -175,8 +175,9 @@ Model getGroundModel(double s) {
 
     std::vector<unsigned int> indices = {0, 2, 1, 0, 3, 2};
     Mesh groundMesh(vertices, indices);
-    Model ground;
-    ground.meshes.push_back(groundMesh);
+    // Model ground;
+    // ground.meshes.push_back(groundMesh);
+    Model ground = Model(CRL_DATA_FOLDER "/meshes/demo.obj");
 
     return ground;
 }
