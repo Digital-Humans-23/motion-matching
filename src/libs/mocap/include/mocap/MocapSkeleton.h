@@ -30,7 +30,7 @@ public:
 
     // frame
     // up axis and the axis where the character is heading toward.
-    V3D forwardAxis = V3D(1, 0, 0);
+    V3D forwardAxis = V3D(-1, 0, 0);
     V3D upAxis = V3D(0, 1, 0);
 
 public:
@@ -72,7 +72,7 @@ public:
         if (!joint->parent)
             return joint->state.velocity;
         // this is a bit tricky...
-        // relVel = Rparent.inverse * (vWorld - vParentWorld - wParentWorld x (rWorld - rParentWorld))
+        // relVel = Rparent.inverse * (vWorld - vParentWorld - wWorld x (rWorld - rParentWorld))
         V3D tmp =
             joint->state.velocity - joint->parent->state.velocity - joint->parent->state.angularVelocity.cross(V3D(joint->parent->state.pos, joint->state.pos));
         return joint->parent->state.getLocalCoordinates(tmp);

@@ -4,7 +4,6 @@
 #include "mocap/MocapSkeleton.h"
 #include "mocap/MocapSkeletonState.h"
 #include "omp.h"
-#include "mocap/MotionInterpolator.h"
 
 namespace crl::mocap {
 
@@ -27,13 +26,9 @@ protected:
     // 1 frame = 1 motion
     std::vector<StateType> motions_;
 
-    /*!< interpolator */
-    MotionInterpolator *interpolator;
-
 public:
     virtual ~MocapClip() {
         delete model_;
-        delete interpolator;
     }
 
     bool operator<(const MocapClip &other) const {
@@ -106,12 +101,9 @@ private:
         // model_ = new MocapSkeleton(mocapPath.c_str());
         model_ = new MocapSkeleton(mocapPath.string().c_str());
 
-        /*!< create interpolator */
-        interpolator = new MotionInterpolator(model_, 1.0/30.0, 1.0/30.0);
-
         // load motion
         auto bvhJoints = data.getJoints();
-        double dt = data.getFrameTime()/2.0; /*!< upsample to 60fps */
+        double dt = data.getFrameTime();
 
         // name_ = std::string(mocapPath.filename());
         name_ = mocapPath.filename().string();
@@ -119,11 +111,10 @@ private:
 
         // save frame into motion
         // need to start index = 1 to compute velocity by FD
-        motions_.reserve(2*data.getFramesCount()-3);
+        motions_.reserve(data.getFramesCount());
         for (int i = 0; i < motions_.capacity(); i++) motions_.emplace_back(model_);
 
-        /*!< original motion pass */
-        // #pragma omp parallel for
+        #pragma omp parallel for
         for (int i = 1; i < data.getFramesCount(); i++) {
             auto bvhRoot = data.getRootJoint();
 
@@ -136,10 +127,10 @@ private:
             V3D rootVel = V3D(currentT.translation() - previousT.translation()) / dt;
             V3D rootAngVel = estimateAngularVelocity(Quaternion(previousT.rotation()).normalized(), Quaternion(currentT.rotation()).normalized(), dt);
 
-            motions_[2*(i-1)].setRootPosition(P3D() + currentT.translation());
-            motions_[2*(i-1)].setRootOrientation(Quaternion(currentT.rotation()).normalized());
-            motions_[2*(i-1)].setRootVelocity(rootVel);
-            motions_[2*(i-1)].setRootAngularVelocity(rootAngVel);
+            motions_[i-1].setRootPosition(P3D() + currentT.translation());
+            motions_[i-1].setRootOrientation(Quaternion(currentT.rotation()).normalized());
+            motions_[i-1].setRootVelocity(rootVel);
+            motions_[i-1].setRootAngularVelocity(rootAngVel);
 
             // joint state
             for (uint j = 0; j < bvhJoints.size(); j++) {
@@ -152,53 +143,16 @@ private:
                 V3D angVelRel = estimateAngularVelocity(Quaternion(previousLtp.rotation()).normalized(), Quaternion(currentLtp.rotation()).normalized(), dt);
                 V3D velRel = V3D(currentLtp.translation() - previousLtp.translation()) / dt;
 
-                motions_[2*(i-1)].setJointRelativeOrientation(qRel, j);
-                motions_[2*(i-1)].setJointTranslation(tRel, j);
-                motions_[2*(i-1)].setJointRelativeAngVelocity(angVelRel, j);
-                motions_[2*(i-1)].setJointRelativeVelocity(velRel, j);
+                motions_[i-1].setJointRelativeOrientation(qRel, j);
+                motions_[i-1].setJointTranslation(tRel, j);
+                motions_[i-1].setJointRelativeAngVelocity(angVelRel, j);
+                motions_[i-1].setJointRelativeVelocity(velRel, j);
             }
 
             // update frame count
-            // #pragma omp critical
+            #pragma omp critical
             frameCount_++;
         }
-        
-        /*!> motion interpolation pass */
-        for (int i = 0; i < data.getFramesCount()-2; i++) {
-            int idxInterp = 2*i+1; /*!< interpolation position */
-            int idxLastLast, idxLast, idxNext, idxNextNext;
-            if (i==0) { idxLastLast=0; idxLast=0; idxNext=2; idxNextNext=4; }
-            else if (i== data.getFramesCount()-3) {idxLastLast=idxInterp-3; idxLast=idxInterp-1; idxNext=idxInterp+1; idxNextNext=idxInterp+1;}
-            else { idxLastLast=idxInterp-3; idxLast=idxInterp-1; idxNext=idxInterp+1; idxNextNext=idxInterp+3; }
-
-            interpolator->blend(motions_[idxLastLast], motions_[idxLast], motions_[idxNext], motions_[idxNextNext]);
-            auto interpState = interpolator->evaluate(1.0/60.0);
-
-            motions_[idxInterp].setRootPosition(interpState->getRootPosition());
-            motions_[idxInterp].setRootOrientation(interpState->getRootOrientation());
-            /*!< use FD to approximate velocity */
-            // motions_[idxInterp].setRootVelocity(V3D(motions_[idxInterp-1].getRootPosition(), interpState->getRootPosition())/dt);
-            // motions_[idxInterp].setRootAngularVelocity(estimateAngularVelocity(motions_[idxInterp-1].getRootOrientation(), interpState->getRootOrientation(), dt));
-
-            for (int j = 0; j < bvhJoints.size(); j++) {
-                motions_[idxInterp].setJointRelativeOrientation(interpState->getJointRelativeOrientation(j), j);
-                // motions_[idxInterp].setJointRelativeAngVelocity(estimateAngularVelocity(motions_[idxInterp-1].getJointRelativeOrientation(j), interpState->getJointRelativeOrientation(j), dt), j);
-            }
-
-            frameCount_++;
-        }
-
-        /*!> velocity FD pass */
-        for (int i = 1; i < data.getFramesCount(); i++) {
-            motions_[i].setRootVelocity(V3D(motions_[i-1].getRootPosition(), motions_[i].getRootPosition())/dt);
-            motions_[i].setRootAngularVelocity(estimateAngularVelocity(motions_[i-1].getRootOrientation(), motions_[i].getRootOrientation(), dt));
-
-            for (int j = 0; j < bvhJoints.size(); j++) {
-                motions_[i].setJointRelativeAngVelocity(estimateAngularVelocity(motions_[i-1].getJointRelativeOrientation(j), motions_[i].getJointRelativeOrientation(j), dt), j);
-            }
-
-        }    
-
     }
 };
 
