@@ -175,10 +175,14 @@ Model getGroundModel(double s) {
 
     std::vector<unsigned int> indices = {0, 2, 1, 0, 3, 2};
     Mesh groundMesh(vertices, indices);
-    // Model ground;
-    // ground.meshes.push_back(groundMesh);
-    Model ground = Model(CRL_DATA_FOLDER "/meshes/demo.obj");
+    Model ground;
+    ground.meshes.push_back(groundMesh);
 
+    return ground;
+}
+
+Model getDemoModel() {
+    Model ground = Model(CRL_DATA_FOLDER "/meshes/demo.obj");
     return ground;
 }
 
@@ -190,6 +194,14 @@ void SimpleGroundModel::draw(const Shader &shader, const V3D &col) {
 
 SizableGroundModel::SizableGroundModel(int size) {
     setSize(size);
+}
+
+SizableGroundModel::SizableGroundModel(int size, bool use_demo) {
+    if (use_demo){
+        this->size = size;
+        ground = getDemoModel();
+    }
+    else setSize(size);
 }
 
 void SizableGroundModel::setSize(int size) {

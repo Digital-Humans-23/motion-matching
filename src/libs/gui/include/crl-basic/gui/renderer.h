@@ -48,6 +48,8 @@ void drawSector(const P3D &p, const V3D &from, const V3D &to, const V3D &up, con
 
 Model getGroundModel(double s = 100);
 
+Model getDemoModel();
+
 class SimpleGroundModel {
 public:
     Model ground = getGroundModel(20);
@@ -60,6 +62,7 @@ public:
 class SizableGroundModel {
 public:
     SizableGroundModel(int size);
+    SizableGroundModel(int size, bool use_demo);
 
     void setSize(int size);
 
