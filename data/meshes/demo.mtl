@@ -1,6 +1,9 @@
 # Blender 3.3.1 MTL File: 'demo.blend'
 # www.blender.org
 
-newmtl Material.003
-anisor 45.000000
-map_Kd checkerboard.jpg
+# newmtl Material.003
+# map_Kd checkerboard.jpg
+# Ka 0.2 0.2 0.2
+# Kd 0.8 0.8 0.8
+# Ks 0.0 0.0 0.0
+# Ns 0.0
