@@ -1,2 +1,6 @@
-# Blender 3.3.1 MTL File: 'None'
+# Blender 3.3.1 MTL File: 'demo.blend'
 # www.blender.org
+
+newmtl Material.003
+anisor 45.000000
+map_Kd checkerboard.jpg
