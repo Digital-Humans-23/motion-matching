@@ -628,11 +628,30 @@ void ShadowApplication::drawImGui() {
 
     ImGui::Begin("Main Menu");
     if (ImGui::TreeNode("Ground")) {
+
+        bool oldshowTerrain = showTerrain;
+        ImGui::Checkbox("Show Terrain", &showTerrain);
+        if (!oldshowTerrain && showTerrain){
+                float factor = 0.4;
+                groundColor[0] -= factor;
+                groundColor[1] -= factor;
+                groundColor[2] -= factor;
+                ground = demo;
+                ground.size = 90;
+        }
+        if (oldshowTerrain && !showTerrain){
+                float factor = 0.4;
+                groundColor[0] += factor;
+                groundColor[1] += factor;
+                groundColor[2] += factor;
+                ground = square;
+        }
+
         ImGui::Checkbox("Show Ground", &showGround);
         static int size = ground.getSize();
         static double thickness = ground.gridThickness;
         if (ImGui::SliderInt("Ground Size", &size, 1.0, 100.0)) {
-            ground.setSize(size);
+            ground.size = size;
             ground.gridThickness = thickness;
         }
         if (ImGui::SliderDouble("Grid Thickness", &thickness, 0.001, 0.1))
@@ -665,6 +684,8 @@ void ShadowApplication::drawImGui() {
     }
 
     if (ImGui::TreeNode("Camera")) {
+        ImGui::Checkbox("Track Velocity", &trackVelocity);
+
         if (ImGui::Button("Front")) {
             camera.rotAboutUpAxis = 0;
             camera.rotAboutRightAxis = 0.1;

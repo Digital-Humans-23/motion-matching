@@ -72,10 +72,11 @@ public:
               const V3D &gridColor = V3D(0.78431, 0.78431, 0.78431));
 
 private:
-    int size;
+
     Model ground;
 
 public:
+    int size;
     double gridThickness = 0.025;
     bool showGrid = true;
 };

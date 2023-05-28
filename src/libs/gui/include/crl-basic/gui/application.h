@@ -137,6 +137,7 @@ public:
 public:
     //--- Camera
     TrackingCamera camera;
+    bool trackVelocity = false;
 
     //--- Light & Shadows
     ShadowCastingLight light;
@@ -144,8 +145,11 @@ public:
     float shadowbias = 0.0001f;
 
     //--- Ground
-    SizableGroundModel ground = SizableGroundModel(10);
+    SizableGroundModel square = SizableGroundModel(10, false);
+    SizableGroundModel demo = SizableGroundModel(10, true);
+    SizableGroundModel ground = demo;
     bool showGround = true;
+    bool showTerrain = false;
     double groundIntensity = 1.5;
     float groundColor[3] = {1.0, 1.0, 1.0};
 
