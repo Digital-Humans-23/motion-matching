@@ -182,7 +182,7 @@ Model getGroundModel(double s) {
 }
 
 Model getDemoModel() {
-    Model ground = Model(CRL_DATA_FOLDER "../../../../data/creep.obj");
+    Model ground = Model(CRL_DATA_FOLDER "/../../../../data/creep.obj");
     return ground;
 }
 
