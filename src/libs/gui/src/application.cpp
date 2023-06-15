@@ -649,7 +649,6 @@ void ShadowApplication::drawImGui() {
                 groundColor[0] -= factor;
                 groundColor[1] -= factor;
                 groundColor[2] -= factor;
-                ground = demo;
                 ground.size = 90;
         }
         if (new_terrain && mouse_mode == NONE){
@@ -657,7 +656,6 @@ void ShadowApplication::drawImGui() {
                 groundColor[0] += factor;
                 groundColor[1] += factor;
                 groundColor[2] += factor;
-                ground = square;
         }
 
         ImGui::Checkbox("Show Ground", &showGround);
