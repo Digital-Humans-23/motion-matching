@@ -645,17 +645,15 @@ void ShadowApplication::drawImGui() {
         }
 
         if (new_terrain && mouse_mode != NONE){
-                float factor = 0.4;
-                groundColor[0] -= factor;
-                groundColor[1] -= factor;
-                groundColor[2] -= factor;
+                groundColor[0] = 0.6;
+                groundColor[1] = 0.6;
+                groundColor[2] = 0.6;
                 ground.size = 90;
         }
         if (new_terrain && mouse_mode == NONE){
-                float factor = 0.4;
-                groundColor[0] += factor;
-                groundColor[1] += factor;
-                groundColor[2] += factor;
+                groundColor[0] = 1.0;
+                groundColor[1] = 1.0;
+                groundColor[2] = 1.0;
         }
 
         ImGui::Checkbox("Show Ground", &showGround);
