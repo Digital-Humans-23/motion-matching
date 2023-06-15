@@ -629,23 +629,34 @@ void ShadowApplication::drawImGui() {
     ImGui::Begin("Main Menu");
     if (ImGui::TreeNode("Ground")) {
 
-        bool oldshowTerrain = showTerrain;
-        ImGui::Checkbox("Show Terrain", &showTerrain);
-        if (!oldshowTerrain && showTerrain){
-                float factor = 0.4;
-                groundColor[0] -= factor;
-                groundColor[1] -= factor;
-                groundColor[2] -= factor;
-                ground = demo;
-                ground.size = 90;
+        // bool oldshowTerrain = showTerrain;
+        // ImGui::Checkbox("Show Terrain", &showTerrain);
+        int mouse_mode_type = static_cast<int>(mouse_mode);
+        if (ImGui::Combo("Show Terrain", &mouse_mode_type, "Forest1\0Forest2\0Forest3\0NONE\0"))
+        {
+            MouseMode old_mouse_mode = mouse_mode;
+            mouse_mode = static_cast<MouseMode>(mouse_mode_type);
+            if (old_mouse_mode != mouse_mode && mouse_mode == Forest1) ground = forest1;
+            if (old_mouse_mode != mouse_mode && mouse_mode == Forest2) ground = forest2;
+            if (old_mouse_mode != mouse_mode && mouse_mode == Forest3) ground = forest3;
+            if (old_mouse_mode != mouse_mode && mouse_mode == NONE) ground = square;
         }
-        if (oldshowTerrain && !showTerrain){
-                float factor = 0.4;
-                groundColor[0] += factor;
-                groundColor[1] += factor;
-                groundColor[2] += factor;
-                ground = square;
-        }
+
+        // if (!oldshowTerrain && showTerrain){
+        //         float factor = 0.4;
+        //         groundColor[0] -= factor;
+        //         groundColor[1] -= factor;
+        //         groundColor[2] -= factor;
+        //         ground = demo;
+        //         ground.size = 90;
+        // }
+        // if (oldshowTerrain && !showTerrain){
+        //         float factor = 0.4;
+        //         groundColor[0] += factor;
+        //         groundColor[1] += factor;
+        //         groundColor[2] += factor;
+        //         ground = square;
+        // }
 
         ImGui::Checkbox("Show Ground", &showGround);
         static int size = ground.getSize();

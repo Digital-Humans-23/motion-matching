@@ -145,9 +145,11 @@ public:
     float shadowbias = 0.0001f;
 
     //--- Ground
-    SizableGroundModel square = SizableGroundModel(10, false);
-    SizableGroundModel demo = SizableGroundModel(10, true);
-    SizableGroundModel ground = demo;
+    SizableGroundModel square = SizableGroundModel(10);
+    SizableGroundModel forest1 = SizableGroundModel(10, "forest1");
+    SizableGroundModel forest2 = SizableGroundModel(10, "forest2");
+    SizableGroundModel forest3 = SizableGroundModel(10, "forest3");
+    SizableGroundModel ground = square;
     bool showGround = true;
     bool showTerrain = false;
     double groundIntensity = 1.5;
@@ -161,6 +163,10 @@ public:
     Shader shadowShader = Shader(CRL_SHADER_FOLDER "/basic_lighting.vert", CRL_SHADER_FOLDER "/basic_shadow_lighting.frag");
     Shader shadowMapRenderer = Shader(CRL_SHADER_FOLDER "/basic_lighting.vert", CRL_SHADER_FOLDER "/render_shadow.frag");
     Shader basicShader = Shader(CRL_SHADER_FOLDER "/basic_lighting.vert", CRL_SHADER_FOLDER "/basic_lighting.frag");
+
+private:
+    enum MouseMode { Forest1, Forest2, Forest3, NONE };
+    MouseMode mouse_mode = NONE;
 };
 
 }  // namespace gui

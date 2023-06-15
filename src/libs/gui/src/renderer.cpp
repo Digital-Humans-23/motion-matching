@@ -181,8 +181,14 @@ Model getGroundModel(double s) {
     return ground;
 }
 
-Model getDemoModel() {
-    Model ground = Model(CRL_DATA_FOLDER "/../../../../data/creep.obj");
+Model getDemoModel(std::string terrain_type) {
+    Model ground;
+    if (terrain_type == "forest1")
+        ground = Model(CRL_DATA_FOLDER "/../../../../data/forest.obj");
+    if (terrain_type == "forest2")
+        ground = Model(CRL_DATA_FOLDER "/../../../../data/rocks.obj");
+    if (terrain_type == "forest3")
+        ground = Model(CRL_DATA_FOLDER "/../../../../data/creep.obj");
     return ground;
 }
 
@@ -196,10 +202,10 @@ SizableGroundModel::SizableGroundModel(int size) {
     setSize(size);
 }
 
-SizableGroundModel::SizableGroundModel(int size, bool use_demo) {
-    if (use_demo){
+SizableGroundModel::SizableGroundModel(int size, std::string terrain_type) {
+    if (terrain_type != "None"){
         this->size = size;
-        ground = getDemoModel();
+        ground = getDemoModel(terrain_type);
     }
     else setSize(size);
 }

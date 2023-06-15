@@ -62,7 +62,7 @@ public:
 class SizableGroundModel {
 public:
     SizableGroundModel(int size);
-    SizableGroundModel(int size, bool use_demo);
+    SizableGroundModel(int size, std::string terrain_type);
 
     void setSize(int size);
 
