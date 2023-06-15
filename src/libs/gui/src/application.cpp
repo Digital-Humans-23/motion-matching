@@ -614,7 +614,7 @@ void ShadowApplication::renderPass() {
 
 void ShadowApplication::drawObjectsWithShadows(const Shader &shader) {
     if (showGround)
-        ground.draw(shader, groundIntensity, crl::gui::toV3D(groundColor));
+        ground->draw(shader, groundIntensity, crl::gui::toV3D(groundColor));
 
     if(show_world_frame){
         crl::gui::drawArrow3d(P3D(0,0,0), world_frame_length * V3D(1,0,0), world_frame_radius, shader, V3D(0.75, 0.25, 0.25), 1.0);
@@ -648,7 +648,7 @@ void ShadowApplication::drawImGui() {
                 groundColor[0] = 0.6;
                 groundColor[1] = 0.6;
                 groundColor[2] = 0.6;
-                ground.size = 90;
+                ground->size = 90;
         }
         if (new_terrain && mouse_mode == NONE){
                 groundColor[0] = 1.0;
@@ -657,15 +657,15 @@ void ShadowApplication::drawImGui() {
         }
 
         ImGui::Checkbox("Show Ground", &showGround);
-        static int size = ground.getSize();
-        static double thickness = ground.gridThickness;
+        static int size = ground->getSize();
+        static double thickness = ground->gridThickness;
         if (ImGui::SliderInt("Ground Size", &size, 1.0, 100.0)) {
-            ground.size = size;
-            ground.gridThickness = thickness;
+            ground->size = size;
+            ground->gridThickness = thickness;
         }
         if (ImGui::SliderDouble("Grid Thickness", &thickness, 0.001, 0.1))
-            ground.gridThickness = thickness;
-        ImGui::Checkbox("Show Grid", &ground.showGrid);
+            ground->gridThickness = thickness;
+        ImGui::Checkbox("Show Grid", &(ground->showGrid));
         ImGui::SliderDouble("Ground Intensity", &groundIntensity, 0.0, 10.0);
         ImGui::ColorPicker3("Ground Color", &groundColor[0]);
 

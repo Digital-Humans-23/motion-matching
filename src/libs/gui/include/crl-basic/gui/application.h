@@ -145,11 +145,11 @@ public:
     float shadowbias = 0.0001f;
 
     //--- Ground
-    SizableGroundModel square = SizableGroundModel(10);
-    SizableGroundModel forest1 = SizableGroundModel(10, "forest1");
-    SizableGroundModel forest2 = SizableGroundModel(10, "forest2");
-    SizableGroundModel forest3 = SizableGroundModel(10, "forest3");
-    SizableGroundModel ground = square;
+    SizableGroundModel* square = new SizableGroundModel(10);
+    SizableGroundModel* forest1 = new SizableGroundModel(10, "forest1");
+    SizableGroundModel* forest2 = new SizableGroundModel(10, "forest2");
+    SizableGroundModel* forest3 = new SizableGroundModel(10, "forest3");
+    SizableGroundModel* ground = square;
     bool showGround = true;
     bool showTerrain = false;
     double groundIntensity = 1.5;
